@@ -4,7 +4,8 @@ import { Context, h, Schema, Time, type Session } from 'koishi'
 import { API_BASE, CatalogCache, type Channel } from './catalog'
 import { canUpgrade, describe, entryImage, poolName } from './format'
 import { parseChannel, search } from './search'
-import { ImageCache, readImage } from './image-cache'
+import { ImageCache } from './image-cache'
+import { describeImageError, downloadImage } from './image-download'
 import { loadQuery, LookupCache } from './lookup'
 import { preload, type PreloadProgress } from './preload'
 import zhCN from './locales/zh-CN.yml'
@@ -60,10 +61,10 @@ export function apply(ctx: Context, config: Config) {
         nextDownload = due + 250
         await delay(Math.max(0, due - Date.now()), undefined, { signal: abort.signal })
       }
-      return ctx.http.get<Buffer>(url, { responseType: readImage, timeout: config.timeout, redirect: 'error' })
+      return downloadImage(ctx.http, url, config.timeout, abort.signal)
     }, (operation, error) => {
       // Keep API credentials and HTTP request details out of logs.
-      logger.warn('image cache %s failed (%s)', operation, error instanceof Error ? error.name : 'unknown error')
+      logger.warn('image cache %s failed (%s)', operation, describeImageError(error))
     })
   const request = (path: string, channel: Channel, search?: string) => ctx.http.get(`${API_BASE}${path}`, {
     params: { lang: 'zhs', ...(channel === 'beta' ? { channel } : {}), ...(search === undefined ? {} : { search }) },

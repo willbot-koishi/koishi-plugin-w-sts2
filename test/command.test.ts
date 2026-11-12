@@ -20,7 +20,7 @@ afterEach(async () => {
 })
 
 async function fixture(config: Partial<sts2.Config> = {}, locale = 'zh-CN', fail = false,
-  requestImage: (url: string) => Promise<Uint8Array> = async () => imageBytes) {
+  requestImage: (url: string) => Promise<Uint8Array | Response> = async () => imageBytes) {
   const ctx = new Context()
   const directory = await mkdtemp(path.join(tmpdir(), 'w-sts2-command-'))
   ctx.baseDir = directory
@@ -31,7 +31,8 @@ async function fixture(config: Partial<sts2.Config> = {}, locale = 'zh-CN', fail
     async get(url: string, config: any) {
       if (! url.includes('/api/')) {
         imageCalls.push({ url, config })
-        return requestImage(url)
+        const result = await requestImage(url)
+        return config.responseType(result instanceof Response ? result : new Response(Buffer.from(result)))
       }
       calls.push({ url, config })
       if (fail) throw new Error('offline')
@@ -167,11 +168,24 @@ test('reuses image bytes across repeated lookups and sends no CDN credentials or
   await client.receive('sts2.card BASH')
   assert.equal(imageCalls.length, 1)
   assert.equal(imageCalls[0].config.headers, undefined)
-  assert.equal(imageCalls[0].config.redirect, 'error')
+  assert.equal(imageCalls[0].config.redirect, 'manual')
   const [image] = h.select(sent[0], 'img')
   assert.equal(image.attrs.src, `data:image/png;base64,${imageBytes.toString('base64')}`)
   assert.doesNotMatch(sent[0].join(''), new RegExp(directory))
   assert.doesNotMatch(sent[0].join(''), /test-only-key|https:\/\/cdn/)
+})
+
+test('follows relic redirects without forwarding API credentials and caches bytes under the original URL', async () => {
+  const source = 'https://spire-codex.com/static/images/relics/burning_blood.webp'
+  const target = 'https://cdn.spire-codex.com/relics/burning_blood.webp'
+  const { client, imageCalls, sent } = await fixture({ apiKey: 'test-only-key' }, 'zh-CN', false, async url => url === source
+    ? new Response(null, { status: 301, headers: { location: target } })
+    : imageBytes)
+  await client.shouldReply('sts2.relic 燃烧之血', /data:image\/png;base64/)
+  await client.shouldReply('sts2.relic 燃烧之血', /data:image\/png;base64/)
+  assert.deepEqual(imageCalls.map(call => call.url), [source, target])
+  assert.ok(imageCalls.every(call => call.config.headers === undefined && call.config.redirect === 'manual'))
+  assert.doesNotMatch(sent.map(elements => elements.join('')).join(''), /test-only-key|https:\/\//)
 })
 
 test('keeps channels and normal/upgraded images separate and skips disabled images', async () => {
