@@ -11,6 +11,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@satorijs/element",
     "types": [
@@ -19,6 +20,7 @@
     ]
   },
   "include": [
-    "src"
+    "src",
+    "src/data/legacy-names.json"
   ]
 }

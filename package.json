@@ -1,21 +1,60 @@
 {
   "name": "koishi-plugin-w-sts2",
-  "description": "WillBot: Slay The Spire 2 Functions",
+  "description": "WillBot: Slay the Spire 2 card and relic lookup",
   "version": "0.0.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist"
+    "docs"
   ],
   "license": "MIT",
-  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willbot-koishi/koishi-plugin-w-sts2.git"
+  },
+  "homepage": "https://github.com/willbot-koishi/koishi-plugin-w-sts2#readme",
+  "bugs": {
+    "url": "https://github.com/willbot-koishi/koishi-plugin-w-sts2/issues"
+  },
+  "koishi": {
+    "description": {
+      "zh": "杀戮尖塔 2 卡牌与遗物查询，支持正式版和 beta",
+      "en": "Slay the Spire 2 card and relic lookup, with stable and beta channels"
+    },
+    "service": {
+      "required": [
+        "http"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "yarn run -T build w-sts2",
+    "bump": "yarn run -T bump w-sts2",
+    "pub": "yarn run -T pub w-sts2",
+    "check": "tsc -p tsconfig.test.json --noEmit --incremental false --composite false",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "test": "yarn run -T tsx --require yml-register --test test/*.test.ts",
+    "audit:data": "yarn run -T tsx scripts/audit.ts"
+  },
+  "devDependencies": {
+    "@koishijs/plugin-database-memory": "^3.7.0",
+    "@koishijs/plugin-mock": "^2.6.6",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^22.19.7",
+    "eslint": "^10.2.0",
+    "globals": "^17.4.0",
+    "jiti": "^2.7.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.1",
+    "yml-register": "^1.2.5"
+  },
   "keywords": [
     "chatbot",
     "koishi",
     "plugin"
   ],
-  "devDependencies": {},
   "peerDependencies": {
     "koishi": "^4.18.10"
   }

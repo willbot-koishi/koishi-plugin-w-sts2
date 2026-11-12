@@ -1,0 +1,76 @@
+_config:
+  defaultChannel: Default data channel (stable or beta). Override per query with -c.
+  cacheAge: Data lifetime. Ordinary lookups refresh only their own results when a full snapshot expires.
+  dataCacheDir: Full snapshot directory, relative to the Koishi working directory. Updated by sts2.cache and reused after restarts.
+  timeout: Timeout for Spire Codex requests.
+  apiKey: Optional Spire Codex API key for a higher rate limit.
+  showImages: Send Chinese card renders or relic images by default. Use -t for text only.
+  imageCacheDir: Image disk cache directory, relative to the Koishi working directory. Reused after restarts.
+  imageCacheAge: Image cache lifetime. Defaults to one day and refreshes on demand.
+  maxResults: Maximum number of search candidates to display.
+
+commands:
+  sts2: &command
+    description: Look up Slay the Spire 2 cards and relics
+    options:
+      channel: Select stable / beta (defaults to the plugin configuration)
+      upgrade: Show the upgraded card
+      index: Select a search result by its number
+      text: Show text only
+  sts2.card:
+    <<: *command
+    description: Look up Slay the Spire 2 cards
+  sts2.relic:
+    <<: *command
+    description: Look up Slay the Spire 2 relics
+  sts2.cache:
+    description: Cache all Slay the Spire 2 cards, relics and images (authority 3)
+    options:
+      channel: Select the stable / beta channel to cache
+      all: Cache both stable and beta channels
+      text: Cache text data only, without predownloading images
+
+sts2:
+  missing-query: 'Enter a name, legacy name or internal ID. Example: sts2.card BASH -c beta'
+  invalid-channel: Invalid channel. Use -c stable or -c beta.
+  unavailable: '{channel} data is temporarily unavailable. Please retry later. No other channel will be substituted.'
+  source: 'Spire Codex · {channel}'
+  stale: 'Refresh failed; using cached data from {time}.'
+  image-stale: Image refresh failed; using the cached image.
+  image-unavailable: Image unavailable; showing text only.
+  cache-start: 'Warming full cache: {channels}. Images may take a few minutes; invoke this command again to check progress.'
+  cache-busy: 'A full-cache task is already running: {channel}, images {done}/{total}.'
+  cache-result: '{channel} cache finished: {cards} cards, {relics} relics; {success}/{total} valid images, {failed} failed.'
+  cache-stale: '{channel} data refresh failed. An old snapshot was used, not the latest full catalog.'
+  cache-failed: '{channel} full data could not be fetched or saved. Please retry later.'
+  not-found: 'No results for "{query}".'
+  invalid-index: 'Index out of range. There are {count} results.'
+  multiple: '{count} results:'
+  candidate: '{index}. {name} · {pool} · {kind} [{id}]'
+  truncated: 'Only the first {count} results are shown. Refine your query or use an internal ID.'
+  select-hint: Append -i NUMBER to select a result, or query its internal ID.
+  cannot-upgrade: This entry has no available upgraded version.
+  title: '{name} [{id}]'
+  card: Card
+  relic: Relic
+  cost: 'Energy: {value}'
+  star-cost: 'Stars: {value}'
+  energy: '{amount} Energy'
+  star: '{amount} Stars'
+  channels:
+    stable: Stable
+    beta: Beta
+  pools:
+    ironclad: Ironclad
+    silent: Silent
+    regent: Regent
+    necrobinder: Necrobinder
+    defect: Defect
+    colorless: Colorless
+    curse: Curse
+    status: Status
+    event: Event
+    token: Token
+    ancient: Ancient
+    shared: Shared
+    quest: Quest

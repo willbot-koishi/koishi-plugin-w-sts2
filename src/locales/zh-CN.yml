@@ -1,0 +1,76 @@
+_config:
+  defaultChannel: 默认查询正式版（stable）或测试版（beta）。每次查询可用 -c 覆盖。
+  cacheAge: 数据缓存有效期。全量快照过期后，普通查询仅刷新本次查询结果。
+  dataCacheDir: 全量数据快照目录，相对 Koishi 工作目录。由 sts2.cache 更新，重启后可复用。
+  timeout: Spire Codex 请求超时时间。
+  apiKey: 可选的 Spire Codex API Key，用于提高限流额度。
+  showImages: 默认发送中文卡图或遗物图片，可用 -t 仅显示文本。
+  imageCacheDir: 图片磁盘缓存目录，相对 Koishi 工作目录。重启后仍可复用。
+  imageCacheAge: 图片缓存有效期，默认一天，过期后按需刷新。
+  maxResults: 一次最多显示的搜索候选数。
+
+commands:
+  sts2: &command
+    description: 查询杀戮尖塔 2 卡牌与遗物
+    options:
+      channel: 选择 stable / beta（默认使用插件配置）
+      upgrade: 查看升级后的卡牌
+      index: 选择搜索结果序号
+      text: 仅显示文本
+  sts2.card:
+    <<: *command
+    description: 查询杀戮尖塔 2 卡牌
+  sts2.relic:
+    <<: *command
+    description: 查询杀戮尖塔 2 遗物
+  sts2.cache:
+    description: 全量缓存杀戮尖塔 2 卡牌、遗物及图片（权限 3）
+    options:
+      channel: 选择要缓存的 stable / beta 分支
+      all: 缓存 stable 和 beta 两个分支
+      text: 仅缓存文本数据，不预下载图片
+
+sts2:
+  missing-query: 请输入名称、旧名称或内部 ID。例如：sts2.card 战鼓 -c beta
+  invalid-channel: 无效的分支，请使用 -c stable 或 -c beta。
+  unavailable: '{channel}数据暂时无法获取，请稍后重试。不会使用其它分支代替。'
+  source: 'Spire Codex · {channel}'
+  stale: '刷新失败，使用 {time} 缓存的数据。'
+  image-stale: 图片刷新失败，使用已缓存的图片。
+  image-unavailable: 图片暂时无法加载，已仅显示文本。
+  cache-start: '开始全量缓存：{channels}。图片较多时可能需要几分钟；再次调用指令可查看当前进度。'
+  cache-busy: '已有全量缓存任务正在运行：{channel}，图片进度 {done}/{total}。'
+  cache-result: '{channel}缓存完成：卡牌 {cards}，遗物 {relics}；图片有效 {success}/{total}，失败 {failed}。'
+  cache-stale: '{channel}数据刷新失败，本次使用旧快照，未取得最新全量数据。'
+  cache-failed: '{channel}全量数据暂时无法获取或保存，请稍后重试。'
+  not-found: '没有找到「{query}」。'
+  invalid-index: '序号超出范围，共有 {count} 个结果。'
+  multiple: '找到 {count} 个结果：'
+  candidate: '{index}. {name} · {pool} · {kind} [{id}]'
+  truncated: '仅显示前 {count} 项，请缩小关键词或使用内部 ID。'
+  select-hint: 请追加 -i 序号查看，或使用结果中的内部 ID 查询。
+  cannot-upgrade: 该条目没有可查询的升级版本。
+  title: '{name} [{id}]'
+  card: 卡牌
+  relic: 遗物
+  cost: '能量：{value}'
+  star-cost: '星星：{value}'
+  energy: '{amount}点能量'
+  star: '{amount}颗星星'
+  channels:
+    stable: 正式版
+    beta: 测试版（beta）
+  pools:
+    ironclad: 铁甲战士
+    silent: 静默猎手
+    regent: 储君
+    necrobinder: 亡灵契约师
+    defect: 故障机器人
+    colorless: 无色
+    curse: 诅咒
+    status: 状态
+    event: 事件
+    token: 衍生
+    ancient: 先古之民
+    shared: 通用
+    quest: 任务

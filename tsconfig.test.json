@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "."
+  },
+  "include": ["src", "src/data/legacy-names.json", "test", "scripts"]
+}
