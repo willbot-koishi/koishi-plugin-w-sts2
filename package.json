@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-w-sts2",
   "description": "WillBot: Slay the Spire 2 card and relic lookup",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
